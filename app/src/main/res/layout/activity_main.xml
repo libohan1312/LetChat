@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    tools:context="com.ltc.letchat.MainActivity">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="1">
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:id="@+id/view"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            />
+
+        <android.support.v4.view.ViewPager
+        android:layout_width="match_parent"
+        android:layout_height="448dp"
+        android:id="@+id/viewpager"
+            android:layout_weight="1">
+
+    </android.support.v4.view.ViewPager>
+
+        <android.support.design.widget.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tablayout"
+            app:tabBackground="@color/colorPrimary"
+            >
+
+    </android.support.design.widget.TabLayout>
+    </LinearLayout>
+
+</RelativeLayout>

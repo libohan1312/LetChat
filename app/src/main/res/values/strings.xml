@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LetChat</string>
+    <string name="menu_title_one">one</string>
+    <string name="menu_title_two">two</string>
+</resources>
