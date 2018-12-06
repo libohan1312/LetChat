@@ -3,38 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.ltc.letchat.ChatActivity"
-    >
-    <android.support.v7.widget.Toolbar
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/chattoolbar"
-        android:background="@color/colorPrimary"
-        >
-
-    </android.support.v7.widget.Toolbar>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".chat.ChatActivity">
 
 
-    <ScrollView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/scrollView"
-        android:layout_below="@+id/chattoolbar"
-        android:layout_centerHorizontal="true">
-        <include
-            layout="@layout/ltrecyclerview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/include">
-
-        </include>
-
-        <LinearLayout
+    <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/input"
-            android:background="@color/bright_foreground_disabled_material_dark">
+            android:layout_alignParentBottom="true"
+        android:background="@color/heavywhite"
+        android:paddingTop="4dp">
 
             <Button
                 android:layout_width="60dp"
@@ -57,9 +37,42 @@
                 android:layout_height="match_parent"
                 android:text="send"
                 android:id="@+id/bt_send"
-                android:layout_marginBottom="5dp" />
+                android:layout_marginBottom="5dp"
+                android:background="@color/black_light"
+                android:textColor="@color/white" />
 
         </LinearLayout>
-    </ScrollView>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/barandpager"
+        android:layout_above="@id/input"
+        >
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:id="@+id/chattoolbar"
+            android:layout_alignParentTop="true"
+            app:navigationIcon="@drawable/ic_arrow_back_white_24dp"
+            style="@style/mytoolbar"
+            >
+
+        </android.support.v7.widget.Toolbar>
+
+
+            <include
+                layout="@layout/ltrecyclerview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/include"
+                android:layout_below="@id/chattoolbar"
+                >
+
+            </include>
+
+    </LinearLayout>
 
 </RelativeLayout>

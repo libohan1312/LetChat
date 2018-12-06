@@ -41,3 +41,15 @@ post:
 聊天界面，在线人界面，动态界面
 
 服务端：多人聊天，单对单聊天
+
+临时任务：
+写博客记录：如下
+//添加java8和rxjava过程，主要记录各个网址
+//输入法顶起问题，listview和recyclerview的顶起问题
+theme style attr关系搞清楚
+toolbar 返回按钮
+
+
+优化任务：
+activity 切换动画 transition
+注释：question
