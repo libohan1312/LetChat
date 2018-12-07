@@ -2,10 +2,10 @@ package com.ltc.letchat;
 
 import android.app.Application;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.ltc.letchat.net.api.IChat;
-import com.ltc.letchat.net.websocket.ChatManagerWS;
+import com.ltc.letchat.net.protocol.websocket.ChatManagerWS;
+import com.ltc.letchat.net.protocol.websocket.javawebsocket.JWChatManager;
 
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -26,7 +26,7 @@ public class MyApplication extends Application {
             Map<String,String> heads = new HashMap<>();
             heads.put(Constant.USERID,Constant.userid);
 
-            chatManager = ChatManagerWS.init(heads);
+            chatManager = JWChatManager.getInstance(heads);
             chatManager.onOpen(new IChat.OnConnectOpen() {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {

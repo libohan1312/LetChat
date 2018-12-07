@@ -1,24 +1,18 @@
-package com.ltc.letchat.net.websocket;
+package com.ltc.letchat.net.protocol.websocket.javawebsocket;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
-import com.ltc.letchat.Constant;
 import com.ltc.letchat.contacts.data.Contact;
-import com.ltc.letchat.net.api.IChat;
+import com.ltc.letchat.net.protocol.websocket.ChatManagerWS;
 import com.ltc.letchat.net.request.GetContacts;
 import com.ltc.letchat.net.response.BaseResponse;
 import com.ltc.letchat.util.Utils;
 
 import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.drafts.Draft;
-import org.java_websocket.drafts.Draft_10;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
@@ -26,41 +20,34 @@ import java.util.Map;
 /**
  * Created by Administrator on 2016/7/30.
  */
-public class ChatManagerWS implements IChat {
-    private Handler handler = new Handler(Looper.myLooper());
-    private WebSocketClient client;
-    private OnReceiveMsgListener listener;
-    private OnGetContactsListener getContactsListener;
-    private OnConnectOpen onConnectOpen;
+public class JWChatManager extends ChatManagerWS {
 
-    private URI serverUri;
-
-    private Draft draft = new Draft_10();
-
-    private static ChatManagerWS instance;
-
-    public static ChatManagerWS init(Map<String,String> heads) throws URISyntaxException {
+    WebSocketClient client;
+    public static ChatManagerWS getInstance(Map<String,String> heads) throws URISyntaxException {
         if(instance == null){
             synchronized (ChatManagerWS.class){
                 if(instance == null){
-                    instance = new ChatManagerWS(heads);
+                    instance = new JWChatManager(heads);
                 }
             }
         }
         return instance;
     }
 
+
     public boolean isConnect() {
         return client.getConnection().isOpen();
     }
 
-    private ChatManagerWS(Map<String,String> heads) throws URISyntaxException {
-        serverUri = new URI(Constant.serverUri);
+    private JWChatManager(Map<String,String> heads) throws URISyntaxException {
+        super(heads);
+    }
 
+    @Override
+    protected void init(Map<String,String> heads) {
         client = new WebSocketClient(serverUri,draft,heads,2000) {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
-
                 onConnectOpen.onOpen(handshakedata);
             }
 
