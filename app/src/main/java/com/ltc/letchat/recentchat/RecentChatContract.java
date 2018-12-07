@@ -2,8 +2,8 @@ package com.ltc.letchat.recentchat;/**
  * Created by Administrator on 2016/8/17.
  */
 
-import com.ltc.letchat.BasePresenter;
-import com.ltc.letchat.BaseView;
+import com.ltc.letchat.base.BasePresenter;
+import com.ltc.letchat.base.BaseView;
 
 import java.util.List;
 

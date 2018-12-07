@@ -9,11 +9,11 @@ import java.util.List;
 /**
  * Created by Administrator on 2016/7/18.
  */
-public class MainFragementPagerAdapter extends FragmentPagerAdapter {
+public class MainFragmentPagerAdapter extends FragmentPagerAdapter {
     List<Fragment> views;
     List<String> tabs;
 
-    public MainFragementPagerAdapter(FragmentManager fm, List<Fragment> fragments, List<String> titles) {
+    public MainFragmentPagerAdapter(FragmentManager fm, List<Fragment> fragments, List<String> titles) {
         super(fm);
         views = fragments;
         tabs = titles;

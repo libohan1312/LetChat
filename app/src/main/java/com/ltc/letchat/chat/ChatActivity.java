@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 
 import com.ltc.letchat.MyApplication;
 import com.ltc.letchat.R;
+import com.ltc.letchat.base.BaseActivity;
 import com.ltc.letchat.net.api.IChat;
 import com.ltc.letchat.net.request.Talk;
 import com.ltc.letchat.util.Utils;
@@ -24,7 +25,7 @@ import com.ltc.letchat.util.Utils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends BaseActivity {
 
     @BindView(R.id.chatlist)
     RecyclerView recyclerView;

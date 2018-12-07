@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.ltc.letchat.MyApplication;
 import com.ltc.letchat.R;
+import com.ltc.letchat.base.BaseActivity;
 import com.ltc.letchat.contacts.ContactFragment;
 import com.ltc.letchat.news.NewsFragment;
 import com.ltc.letchat.recentchat.RecentChatFragment;
@@ -26,7 +27,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @BindView(R.id.view)
     Toolbar toolbar;
@@ -45,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar);
 
 
 
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         fragments.add(ContactFragment.newInstance());
         fragments.add(NewsFragment.newInstance("",""));
 
-        MainFragementPagerAdapter fragementPagerAdapter = new MainFragementPagerAdapter(getSupportFragmentManager(),fragments,tabs);
+        MainFragmentPagerAdapter fragementPagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(),fragments,tabs);
 
         viewPager.setAdapter(fragementPagerAdapter);
         TabLayout tableLayout = (TabLayout) findViewById(R.id.tablayout);
