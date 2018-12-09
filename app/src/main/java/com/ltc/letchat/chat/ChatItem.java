@@ -7,4 +7,5 @@ public class ChatItem {
     boolean isMe;
     String fromHow;
     String content;
+    boolean success = true;
 }

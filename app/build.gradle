@@ -13,6 +13,7 @@ android {
     }
     buildTypes {
         release {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -27,6 +28,14 @@ android {
         abortOnError false
     }
 
+    signingConfigs{
+        debug {
+            storeFile file('official.keystore')//签名文件路径
+            storePassword "bytesdk"
+            keyAlias "official"
+            keyPassword "bytesdk"  //签名密码
+        }
+    }
 }
 
 dependencies {

@@ -48,7 +48,12 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
             holder.head_others.setVisibility(View.GONE);
             holder.head_me.setVisibility(View.VISIBLE);
             holder.text.setGravity(holder.text.getGravity()|Gravity.RIGHT);
-            holder.text.setBackground(context.getResources().getDrawable(R.drawable.chat_bub_me));
+            if(chatItem.success){
+                holder.text.setBackground(context.getResources().getDrawable(R.drawable.chat_bub_me));
+            }else {
+                holder.text.setBackground(null);
+                holder.text.setBackgroundColor(context.getResources().getColor(R.color.gray));
+            }
         }else {
             holder.head_me.setVisibility(View.GONE);
             holder.head_others.setVisibility(View.VISIBLE);

@@ -16,7 +16,7 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
 
     public RecentChatPresenter(Context context,RecentChatContract.View view){
         recentChatView = view;
-        recentChatView.setPresenter(this);
+        recentChatView.onSetPresenter(this);
         this.context = context;
     }
 

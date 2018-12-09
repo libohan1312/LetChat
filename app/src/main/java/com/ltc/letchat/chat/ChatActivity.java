@@ -25,7 +25,7 @@ import com.ltc.letchat.util.Utils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class ChatActivity extends BaseActivity {
+public class ChatActivity extends BaseActivity implements ChatContract.View{
 
     @BindView(R.id.chatlist)
     RecyclerView recyclerView;
@@ -44,6 +44,8 @@ public class ChatActivity extends BaseActivity {
     String chatUserId;
     String userName;
 
+    ChatContract.Presenter presenter;
+    ChatListAdapter chatListAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,53 +58,34 @@ public class ChatActivity extends BaseActivity {
         Intent intent = getIntent();
         userName = intent.getStringExtra("name");
         chatUserId = intent.getStringExtra("userId");
-        toolbar.setTitle(chatUserId);
+        toolbar.setTitle(userName);
         setSupportActionBar(toolbar);
 
-
+        new ChatPresenter(this,this,chatUserId);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        ChatListAdapter chatListAdapter = new ChatListAdapter(this);
+        chatListAdapter = new ChatListAdapter(this);
         recyclerView.setAdapter(chatListAdapter);
 
         recyclerView.getRootView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 if(isKeyboardShown(recyclerView.getRootView())){
-                    recyclerView.scrollToPosition(recyclerView.getAdapter().getItemCount()-1);
+                    recyclerView.scrollToPosition(chatListAdapter.getItemCount()-1);
 //question here                    hh = getKeyboardHight(recyclerView.getRootView());
 //                    recyclerView.scrollBy(0,hh-linearLayout.getMeasuredHeight());
                 }
             }
         });
         try {
-            MyApplication.getChatManager().receiveMsg(new IChat.OnReceiveMsgListener() {
-                @Override
-                public void onReceive(String uri,String msg) {
-                    ChatItem chatItem = new ChatItem();
-                    chatItem.content = msg;
-                    chatItem.isMe = false;
-                    chatListAdapter.addChat(chatItem);
-                }
-            });
             bt_send.setOnClickListener(v -> {
-                Talk talk = new Talk();
-                talk.setToHow(chatUserId);
-                talk.setContent(editText.getText().toString());
-                String json = Utils.objectToJson(talk);
-                MyApplication.getChatManager().sendMsg(json);
-                ChatItem chatItem = new ChatItem();
-                chatItem.content = editText.getText().toString();
-                chatItem.isMe = true;
-                chatItem.fromHow = "me";
-                chatListAdapter.addChat(chatItem);
-                editText.setText(null);
+                String msg = editText.getText().toString();
+                presenter.sendMessage(chatUserId,msg);
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-
 
     private boolean isKeyboardShown(View rootView) {
         final int softKeyboardHeight = 100;
@@ -119,5 +102,26 @@ public class ChatActivity extends BaseActivity {
         DisplayMetrics dm = rootView.getResources().getDisplayMetrics();
         int heightDiff = rootView.getBottom() - r.bottom;
         return heightDiff;
+    }
+
+    @Override
+    public void showMessage(boolean success,String from,String url, String msg) {
+        ChatItem chatItem = new ChatItem();
+        chatItem.content = msg;
+        chatItem.isMe = "me".equals(from);
+        chatItem.fromHow = from;
+        chatItem.success = success;
+        chatListAdapter.addChat(chatItem);
+        recyclerView.scrollToPosition(chatListAdapter.getItemCount()-1);
+    }
+
+    @Override
+    public void afterSendMessage(boolean success) {
+        editText.setText(null);
+    }
+
+    @Override
+    public void onSetPresenter(ChatContract.Presenter presenter) {
+        this.presenter = presenter;
     }
 }

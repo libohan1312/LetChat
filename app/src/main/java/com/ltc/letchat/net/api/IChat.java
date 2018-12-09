@@ -10,7 +10,7 @@ import java.util.List;
  * Created by Administrator on 2016/7/30.
  */
 public interface IChat {
-    void sendMsg(String msg);
+    boolean sendMsg(String msg);
     void receiveMsg(OnReceiveMsgListener listener);
 
     interface OnReceiveMsgListener{

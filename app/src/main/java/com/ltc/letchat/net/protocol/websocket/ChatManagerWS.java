@@ -41,7 +41,7 @@ public abstract class ChatManagerWS implements IChat {
     public abstract void close();
 
     @Override
-    public abstract void sendMsg(String msg);
+    public abstract boolean sendMsg(String msg);
 
     @Override
     public void receiveMsg(OnReceiveMsgListener listener) {

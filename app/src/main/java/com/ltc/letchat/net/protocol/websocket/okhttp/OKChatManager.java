@@ -1,6 +1,5 @@
 package com.ltc.letchat.net.protocol.websocket.okhttp;
 
-import com.ltc.letchat.net.api.IChat;
 import com.ltc.letchat.net.protocol.websocket.ChatManagerWS;
 
 import java.net.URISyntaxException;
@@ -32,8 +31,8 @@ public class OKChatManager extends ChatManagerWS {
     }
 
     @Override
-    public void sendMsg(String msg) {
-
+    public boolean sendMsg(String msg) {
+        return false;
     }
 
     @Override

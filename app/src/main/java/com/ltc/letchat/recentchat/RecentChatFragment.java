@@ -107,7 +107,7 @@ public class RecentChatFragment extends Fragment implements RecentChatContract.V
     }
 
     @Override
-    public void setPresenter(@NonNull RecentChatContract.Presenter presenter) {
+    public void onSetPresenter(@NonNull RecentChatContract.Presenter presenter) {
         recentChatPresenter = presenter;
     }
 }

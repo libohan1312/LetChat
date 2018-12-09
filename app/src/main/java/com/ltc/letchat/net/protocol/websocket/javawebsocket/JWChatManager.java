@@ -14,6 +14,7 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.channels.NotYetConnectedException;
 import java.util.List;
 import java.util.Map;
 
@@ -99,8 +100,17 @@ public class JWChatManager extends ChatManagerWS {
     }
 
     @Override
-    public void sendMsg(String msg) {
-        client.send(msg);
+    public boolean sendMsg(String msg) {
+        try {
+            if (!isConnect()) {
+                return false;
+            }
+            client.send(msg);
+            return true;
+        } catch (NotYetConnectedException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
