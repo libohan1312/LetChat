@@ -3,6 +3,7 @@ package com.ltc.letchat;
 import android.app.Application;
 import android.util.Log;
 
+import com.ltc.letchat.RxBus.RxBus;
 import com.ltc.letchat.net.api.IChat;
 import com.ltc.letchat.net.protocol.websocket.ChatManagerWS;
 import com.ltc.letchat.net.protocol.websocket.javawebsocket.JWChatManager;
@@ -32,7 +33,7 @@ public class MyApplication extends Application {
                 public void onOpen(ServerHandshake handshakedata) {
                     if(chatManager.isConnect()){
                         Log.e("connect","inninin");
-
+                        RxBus.send(new JWChatManager.EventConnect());
                         //Toast.makeText(getApplicationContext(),"connect success",Toast.LENGTH_LONG).show();
                     }else {
                         Log.e("connect","nono");

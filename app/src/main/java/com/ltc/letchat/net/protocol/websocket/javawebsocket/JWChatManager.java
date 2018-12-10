@@ -2,6 +2,7 @@ package com.ltc.letchat.net.protocol.websocket.javawebsocket;
 
 import android.util.Log;
 
+import com.ltc.letchat.RxBus.RxBus;
 import com.ltc.letchat.contacts.data.Contact;
 import com.ltc.letchat.net.protocol.websocket.ChatManagerWS;
 import com.ltc.letchat.net.request.GetContacts;
@@ -18,11 +19,23 @@ import java.nio.channels.NotYetConnectedException;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+
 /**
  * Created by Administrator on 2016/7/30.
  */
 public class JWChatManager extends ChatManagerWS {
-
+    public static final String EVENT_CONNECT = "event_connect";
+    public static class EventConnect extends RxBus.Event{
+        public EventConnect(){
+            type = EVENT_CONNECT;
+        }
+        @Override
+        public Object getData() {
+            return null;
+        }
+    }
     WebSocketClient client;
     public static ChatManagerWS getInstance(Map<String,String> heads) throws URISyntaxException {
         if(instance == null){
@@ -35,6 +48,7 @@ public class JWChatManager extends ChatManagerWS {
         return instance;
     }
 
+    private Disposable connectDisposable;
 
     public boolean isConnect() {
         return client.getConnection().isOpen();
@@ -130,16 +144,33 @@ public class JWChatManager extends ChatManagerWS {
         }
         if(!isConnect()){
             Log.e("requesterror","request should after connect");
+            connectDisposable = RxBus.bus().subscribe(new Consumer<Object>() {
+                @Override
+                public void accept(Object o) {
+                    if(o instanceof RxBus.Event){
+                        RxBus.Event event = (RxBus.Event) o;
+                        if(EVENT_CONNECT.equals(event.type)){
+                            getContactsImpl(listener);
+                        }
+                    }
+                }
+            });
             return;
+        }else if(connectDisposable != null){
+            connectDisposable.dispose();
         }
 
         try {
-            this.getContactsListener = listener;
-            String getContactsProtocol = Utils.objectToJson(new GetContacts());
-            client.send(getContactsProtocol);
+            getContactsImpl(listener);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void getContactsImpl(OnGetContactsListener listener) {
+        this.getContactsListener = listener;
+        String getContactsProtocol = Utils.objectToJson(new GetContacts());
+        client.send(getContactsProtocol);
     }
 
     @Override

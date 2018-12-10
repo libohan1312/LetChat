@@ -1,8 +1,7 @@
 package com.ltc.letchat.RxBus;
 
-import rx.subjects.PublishSubject;
-import rx.subjects.SerializedSubject;
-import rx.subjects.Subject;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
 
 /**
  * Created by Administrator on 2017/1/2.
@@ -10,8 +9,19 @@ import rx.subjects.Subject;
 
 public class RxBus {
 
-    Subject<Object,Object> bus = new SerializedSubject<>(PublishSubject.create());
+    private static PublishSubject<Object> bus = PublishSubject.create();
 
+    public static Observable<Object> bus(){
+        return bus;
+    }
 
+    public static <T extends Event> void send(T t){
+        bus.onNext(t);
 
+    }
+
+    public static abstract class Event{
+        public String type;
+        public abstract Object getData();
+    }
 }
