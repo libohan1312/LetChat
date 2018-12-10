@@ -5,6 +5,7 @@ package com.ltc.letchat.net.response;
  */
 public class BaseResponse {
     public static final String TYPE_GETCONTACTS_RESP = "GetContactsResp";
+    public static final String TYPE_TOKE_RESP = "Talk";
 
     private String userId;
     private String type;

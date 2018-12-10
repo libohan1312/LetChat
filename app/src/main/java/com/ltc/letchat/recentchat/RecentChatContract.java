@@ -21,7 +21,7 @@ public interface RecentChatContract {
 
         void showNoChatView();
 
-        void showNewChat();
+        void showNewChat(RecentItem item);
 
         void showNoNet();
 

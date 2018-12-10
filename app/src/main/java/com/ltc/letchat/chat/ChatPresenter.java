@@ -7,6 +7,8 @@ import com.ltc.letchat.net.api.IChat;
 import com.ltc.letchat.net.request.Talk;
 import com.ltc.letchat.util.Utils;
 
+import java.io.IOException;
+
 public class ChatPresenter implements ChatContract.Presenter {
     ChatContract.View view;
     Context context;
@@ -18,7 +20,12 @@ public class ChatPresenter implements ChatContract.Presenter {
         MyApplication.getChatManager().receiveMsg(new IChat.OnReceiveMsgListener() {
             @Override
             public void onReceive(String uri,String msg) {
-                view.showMessage(true,userId,uri,msg);
+                try {
+                    String content = Utils.getStringValueFromJson(msg,"content");
+                    view.showMessage(true,userId,uri,content);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

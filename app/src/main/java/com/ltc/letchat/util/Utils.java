@@ -1,20 +1,16 @@
 package com.ltc.letchat.util;
 
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
-import android.util.JsonReader;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonToken;
 import com.ltc.letchat.contacts.data.Contact;
 import com.ltc.letchat.net.response.GetContactsResp;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -35,25 +31,25 @@ public class Utils {
 
 
 
-    public static String getProtocalType(@NonNull String msg) throws IOException, JSONException {
+    public static String getProtocolType(@NonNull String msg) throws IOException, JSONException {
         if(!isGoodJson(msg)){
             return null;
         }
 
-//        JSONObject jsonObject = new JSONObject(msg);
-//
-//        return jsonObject.getString(TYPE);
+        return getStringValueFromJson(msg,"type");
+    }
 
-//        if(!isGoodJson(msg)){
-//            return null;
-//        }
-        JsonReader jsonReader = new JsonReader(new StringReader(msg));
-//        jsonReader.setLenient(true);
+    public static String getStringValueFromJson(String msg,String key) throws IOException{
+        System.out.println("json paras is work to :"+msg+" , key is "+key);
+        com.google.gson.stream.JsonReader jsonReader = new com.google.gson.stream.JsonReader(new StringReader(msg));
         jsonReader.beginObject();
 
         while (jsonReader.hasNext()){
             String name = jsonReader.nextName();
-            if("type".equals(name)){
+            if(key.equals(name)){
+                if(jsonReader.peek() == JsonToken.NULL){
+                    return null;
+                }
                 return jsonReader.nextString();
             }else {
                 jsonReader.skipValue();

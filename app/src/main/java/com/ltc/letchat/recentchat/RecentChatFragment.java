@@ -87,8 +87,8 @@ public class RecentChatFragment extends Fragment implements RecentChatContract.V
     }
 
     @Override
-    public void showNewChat() {
-
+    public void showNewChat(RecentItem item) {
+        chatListAdapter.addItem(item);
     }
 
     @Override

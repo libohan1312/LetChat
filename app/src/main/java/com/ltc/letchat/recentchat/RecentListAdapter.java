@@ -31,7 +31,15 @@ public class RecentListAdapter extends RecyclerView.Adapter<RecentListAdapter.Vi
     }
 
     public void addItem(RecentItem item){
+        for (RecentItem recentItem : datas) {
+            if (item.recentName.equals(recentItem.recentName)) {
+                recentItem.recentTemp = item.recentTemp;
+                notifyDataSetChanged();
+                return;
+            }
+        }
         datas.add(item);
+        notifyDataSetChanged();
     }
 
     @Override

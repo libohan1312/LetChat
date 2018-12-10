@@ -70,28 +70,28 @@ public class JWChatManager extends ChatManagerWS {
             public void onMessage(String message) {
 
                 try {
-                    String type = Utils.getProtocalType(message);
+                    String type = Utils.getProtocolType(message);
                     if(BaseResponse.TYPE_GETCONTACTS_RESP.equals(type)){
                         List<Contact> constants = Utils.getContacts(message);
                         if(getContactsListener == null) return;
                         getContactsListener.onContactReturn(constants);
                         return;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-
-                if(listener != null){
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            listener.onReceive(getURI().getHost(),message);
+                    }else if(BaseResponse.TYPE_TOKE_RESP.equals(type)){
+                        if(listener != null){
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    listener.onReceive(getURI().getHost(),message);
+                                }
+                            });
                         }
-                    });
+                        return;
+                    }
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
                 }
+
+                Log.d("receiveMsgNoHandle",message);
             }
 
             @Override
