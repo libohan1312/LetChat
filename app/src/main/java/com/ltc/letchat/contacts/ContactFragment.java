@@ -12,6 +12,10 @@ import android.view.ViewGroup;
 import com.ltc.letchat.MyApplication;
 import com.ltc.letchat.R;
 import com.ltc.letchat.chat.ChatActivity;
+import com.ltc.letchat.contacts.data.Contact;
+import com.ltc.letchat.net.api.IChat;
+
+import java.util.List;
 
 
 public class ContactFragment extends Fragment {
@@ -39,8 +43,17 @@ public class ContactFragment extends Fragment {
             intent.putExtra("userId",userId);
             startActivity(intent);
         });
-
-        MyApplication.getChatManager().getContacts(contacts -> adapter.setDatas(contacts));
+        MyApplication.getChatManager().getContacts(new IChat.OnGetContactsListener() {
+            @Override
+            public void onContactReturn(List<Contact> contacts) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        adapter.setDatas(contacts);
+                    }
+                });
+            }
+        });
     }
 
     @Override

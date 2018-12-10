@@ -14,6 +14,7 @@ public class ChatPresenter implements ChatContract.Presenter {
     public ChatPresenter(Context context , ChatContract.View view, String userId){
         this.view = view;
         this.userId = userId;
+        view.onSetPresenter(this);
         MyApplication.getChatManager().receiveMsg(new IChat.OnReceiveMsgListener() {
             @Override
             public void onReceive(String uri,String msg) {
@@ -25,7 +26,7 @@ public class ChatPresenter implements ChatContract.Presenter {
     public boolean sendMessage(String userId, String msg) {
         try {
             Talk talk = new Talk();
-            talk.setToHow(userId);
+            talk.setToWho(userId);
             talk.setContent(msg);
             String json = Utils.objectToJson(talk);
             boolean success = MyApplication.getChatManager().sendMsg(json);

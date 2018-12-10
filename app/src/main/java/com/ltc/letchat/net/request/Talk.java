@@ -5,7 +5,7 @@ package com.ltc.letchat.net.request;
  */
 public class Talk extends BaseRequest {
     private String content;
-    private String toHow;
+    private String toWho;
 
     public Talk(){
         setType(BaseRequest.TYPE_TALK);
@@ -19,11 +19,11 @@ public class Talk extends BaseRequest {
         this.content = content;
     }
 
-    public String getToHow() {
-        return toHow;
+    public String getToWho() {
+        return toWho;
     }
 
-    public void setToHow(String toHow) {
-        this.toHow = toHow;
+    public void setToWho(String toWho) {
+        this.toWho = toWho;
     }
 }

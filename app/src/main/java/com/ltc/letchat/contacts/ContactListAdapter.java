@@ -1,6 +1,5 @@
 package com.ltc.letchat.contacts;
 
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ltc.letchat.Constant;
 import com.ltc.letchat.R;
 import com.ltc.letchat.contacts.data.Contact;
 
@@ -25,7 +25,12 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
     List<Contact> datas = new ArrayList<>();
 
     public void setDatas(List<Contact> contacts){
-        datas = contacts;
+        datas.clear();
+        for (Contact contact : contacts) {
+            if (!Constant.userid.equals(contact.getUserId())) {
+                datas.add(contact);
+            }
+        }
         notifyDataSetChanged();
     }
 

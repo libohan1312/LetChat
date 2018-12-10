@@ -40,7 +40,6 @@ public class MyApplication extends Application {
                     }
                 }
             });
-            chatManager.connect();
 
             chatManager.receiveMsg(new IChat.OnReceiveMsgListener() {
                 @Override
@@ -49,6 +48,7 @@ public class MyApplication extends Application {
                 }
             });
 
+            chatManager.connect();
 
         } catch (Exception e) {
             e.printStackTrace();

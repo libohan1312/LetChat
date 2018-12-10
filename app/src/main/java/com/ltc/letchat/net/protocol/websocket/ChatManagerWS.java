@@ -32,7 +32,7 @@ public abstract class ChatManagerWS implements IChat {
     public abstract boolean  isConnect();
 
     protected ChatManagerWS(Map<String,String> heads) throws URISyntaxException {
-        serverUri = new URI(Constant.serverUri);
+        serverUri = new URI(Constant.serverUri_test);
         init(heads);
     }
 

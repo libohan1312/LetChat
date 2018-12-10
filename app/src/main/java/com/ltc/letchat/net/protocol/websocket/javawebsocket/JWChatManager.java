@@ -59,7 +59,9 @@ public class JWChatManager extends ChatManagerWS {
                     String type = Utils.getProtocalType(message);
                     if(BaseResponse.TYPE_GETCONTACTS_RESP.equals(type)){
                         List<Contact> constants = Utils.getContacts(message);
+                        if(getContactsListener == null) return;
                         getContactsListener.onContactReturn(constants);
+                        return;
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -85,7 +87,8 @@ public class JWChatManager extends ChatManagerWS {
 
             @Override
             public void onError(Exception ex) {
-                Log.e("on error",ex.getMessage());
+                //todo not do this
+                Log.e("onerror",ex.getMessage());
                 client = null;
             }
         };
@@ -125,7 +128,10 @@ public class JWChatManager extends ChatManagerWS {
             Log.e("get contacts error","client is null");
             return;
         }
-
+        if(!isConnect()){
+            Log.e("requesterror","request should after connect");
+            return;
+        }
 
         try {
             this.getContactsListener = listener;
