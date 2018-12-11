@@ -77,14 +77,14 @@ public class JWChatManager extends ChatManagerWS {
                         getContactsListener.onContactReturn(constants);
                         return;
                     }else if(BaseResponse.TYPE_TOKE_RESP.equals(type)){
-                        if(listener != null){
-                            handler.post(new Runnable() {
-                                @Override
-                                public void run() {
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                for (OnReceiveMsgListener listener : receiveMsgListeners) {
                                     listener.onReceive(getURI().getHost(),message);
                                 }
-                            });
-                        }
+                            }
+                        });
                         return;
                     }
                 } catch (IOException | JSONException e) {
@@ -131,11 +131,6 @@ public class JWChatManager extends ChatManagerWS {
     }
 
     @Override
-    public void receiveMsg(OnReceiveMsgListener listener) {
-        this.listener = listener;
-    }
-
-    @Override
     public void getContacts(OnGetContactsListener listener) {
 
         if(client == null){
@@ -173,8 +168,4 @@ public class JWChatManager extends ChatManagerWS {
         client.send(getContactsProtocol);
     }
 
-    @Override
-    public void onOpen(OnConnectOpen onConnectOpen) {
-        this.onConnectOpen = onConnectOpen;
-    }
 }

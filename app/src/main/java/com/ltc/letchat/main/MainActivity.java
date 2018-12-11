@@ -45,9 +45,7 @@ public class MainActivity extends BaseActivity {
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-//        setSupportActionBar(toolbar);
-
-
+        setSupportActionBar(toolbar);
 
         ArrayList<String> tabs = new ArrayList<>();
         tabs.add("聊天界面");
@@ -61,11 +59,11 @@ public class MainActivity extends BaseActivity {
         fragments.add(ContactFragment.newInstance());
         fragments.add(NewsFragment.newInstance("",""));
 
-        MainFragmentPagerAdapter fragementPagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(),fragments,tabs);
+        MainFragmentPagerAdapter fragmentPagerAdapter = new MainFragmentPagerAdapter(getSupportFragmentManager(),fragments,tabs);
 
-        viewPager.setAdapter(fragementPagerAdapter);
+        viewPager.setAdapter(fragmentPagerAdapter);
         viewPager.setOffscreenPageLimit(3);
-        TabLayout tableLayout = (TabLayout) findViewById(R.id.tablayout);
+        TabLayout tableLayout = findViewById(R.id.tablayout);
         tableLayout.setTabMode(TabLayout.MODE_FIXED);
         tableLayout.setupWithViewPager(viewPager);
 

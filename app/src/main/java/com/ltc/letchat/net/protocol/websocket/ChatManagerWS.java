@@ -11,6 +11,8 @@ import org.java_websocket.drafts.Draft_10;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +20,7 @@ import java.util.Map;
  */
 public abstract class ChatManagerWS implements IChat {
     protected Handler handler = new Handler(Looper.myLooper());
-    protected OnReceiveMsgListener listener;
+    protected List<OnReceiveMsgListener> receiveMsgListeners;
     protected OnGetContactsListener getContactsListener;
     protected OnConnectOpen onConnectOpen;
 
@@ -33,6 +35,7 @@ public abstract class ChatManagerWS implements IChat {
 
     protected ChatManagerWS(Map<String,String> heads) throws URISyntaxException {
         serverUri = new URI(Constant.serverUri_test);
+        receiveMsgListeners = new ArrayList<>();
         init(heads);
     }
 
@@ -45,7 +48,7 @@ public abstract class ChatManagerWS implements IChat {
 
     @Override
     public void receiveMsg(OnReceiveMsgListener listener) {
-        this.listener = listener;
+        this.receiveMsgListeners.add(listener);
     }
 
     @Override

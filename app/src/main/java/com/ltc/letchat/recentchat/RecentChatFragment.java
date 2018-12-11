@@ -30,17 +30,6 @@ public class RecentChatFragment extends Fragment implements RecentChatContract.V
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        recentChatPresenter.loadRecentChat();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = View.inflate(getActivity(),R.layout.chatrecentlist,null);
@@ -59,6 +48,9 @@ public class RecentChatFragment extends Fragment implements RecentChatContract.V
                 gotoChatView(item.recentName);
             }
         };
+
+        recentChatPresenter.loadRecentChat();
+
         return view;
     }
 
@@ -66,6 +58,7 @@ public class RecentChatFragment extends Fragment implements RecentChatContract.V
     public void gotoChatView(String chatWith) {
         Intent intent = new Intent(getActivity(),ChatActivity.class);
         intent.putExtra("name",chatWith);
+        intent.putExtra("userId",chatWith);
         startActivity(intent);
     }
 

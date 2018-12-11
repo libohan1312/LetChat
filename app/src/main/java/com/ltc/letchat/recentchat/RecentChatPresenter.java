@@ -28,6 +28,7 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
                 try {
                     RecentItem item = new RecentItem();
                     item.head = context.getResources().getDrawable(R.drawable.others);
+                    item.userId = Utils.getStringValueFromJson(msg,"fromWho");
                     item.recentName = Utils.getStringValueFromJson(msg,"fromWho");
                     item.recentTemp = Utils.getStringValueFromJson(msg,"content");
                     view.showNewChat(item);
