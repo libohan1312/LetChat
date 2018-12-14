@@ -3,8 +3,8 @@ package com.ltc.letchat.chat;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.ltc.letchat.MyApplication;
 import com.ltc.letchat.event.ChatEvent;
+import com.ltc.letchat.net.NetworkManager;
 import com.ltc.letchat.net.request.Talk;
 import com.ltc.letchat.util.Utils;
 
@@ -46,9 +46,10 @@ public class ChatPresenter implements ChatContract.Presenter {
             chatEvent.success = true;
             chatEvent.from = "me";
             chatEvent.msg = msg;
-            ChatItem chatItem = getChatItem(chatEvent);
-            view.showMessage(chatItem);
+            chatEvent.to = userId;
             view.afterSendMessage(success);
+            //自己说话也要显示在最近聊天
+            EventBus.getDefault().post(chatEvent);
             return success;
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,7 +63,7 @@ public class ChatPresenter implements ChatContract.Presenter {
         talk.setToWho(userId);
         talk.setContent(msg);
         String json = Utils.objectToJson(talk);
-        return MyApplication.getChatManager().sendMsg(json);
+        return NetworkManager.getChatManager().sendMsg(json);
     }
 
     @Override

@@ -5,4 +5,5 @@ public class ChatEvent {
     public String from;
     public String url;
     public String msg;
+    public String to;
 }

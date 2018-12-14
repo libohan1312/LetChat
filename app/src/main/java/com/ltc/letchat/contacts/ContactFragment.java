@@ -2,18 +2,17 @@ package com.ltc.letchat.contacts;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ltc.letchat.MyApplication;
 import com.ltc.letchat.R;
 import com.ltc.letchat.base.BaseFragment;
 import com.ltc.letchat.chat.ChatActivity;
 import com.ltc.letchat.contacts.data.Contact;
+import com.ltc.letchat.net.NetworkManager;
 import com.ltc.letchat.net.api.IChat;
 
 import java.util.List;
@@ -44,7 +43,7 @@ public class ContactFragment extends BaseFragment {
             intent.putExtra("userId",userId);
             startActivity(intent);
         });
-        MyApplication.getChatManager().getContacts(new IChat.OnGetContactsListener() {
+        NetworkManager.getChatManager().getContacts(new IChat.OnGetContactsListener() {
             @Override
             public void onContactReturn(List<Contact> contacts) {
                 getActivity().runOnUiThread(new Runnable() {

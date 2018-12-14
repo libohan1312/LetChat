@@ -12,6 +12,7 @@ buildscript {
         // in the individual module build.gradle files
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+        classpath "io.objectbox:objectbox-gradle-plugin:2.2.0"
     }
 }
 

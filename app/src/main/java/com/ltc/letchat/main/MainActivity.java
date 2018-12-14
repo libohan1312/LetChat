@@ -11,10 +11,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.ltc.letchat.MyApplication;
 import com.ltc.letchat.R;
 import com.ltc.letchat.base.BaseActivity;
 import com.ltc.letchat.contacts.ContactFragment;
+import com.ltc.letchat.net.NetworkManager;
 import com.ltc.letchat.news.NewsFragment;
 import com.ltc.letchat.recentchat.RecentChatFragment;
 import com.ltc.letchat.recentchat.RecentChatPresenter;
@@ -81,7 +81,7 @@ public class MainActivity extends BaseActivity {
         builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                MyApplication.getChatManager().close();
+                NetworkManager.getChatManager().close();
                 finish();
                 System.exit(0);
             }
