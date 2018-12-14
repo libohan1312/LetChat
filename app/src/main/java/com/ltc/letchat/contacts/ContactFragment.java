@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.ltc.letchat.MyApplication;
 import com.ltc.letchat.R;
+import com.ltc.letchat.base.BaseFragment;
 import com.ltc.letchat.chat.ChatActivity;
 import com.ltc.letchat.contacts.data.Contact;
 import com.ltc.letchat.net.api.IChat;
@@ -18,7 +19,7 @@ import com.ltc.letchat.net.api.IChat;
 import java.util.List;
 
 
-public class ContactFragment extends Fragment {
+public class ContactFragment extends BaseFragment {
 
     ContactListAdapter adapter;
 

@@ -4,6 +4,7 @@ package com.ltc.letchat.recentchat;/**
 
 import com.ltc.letchat.base.BasePresenter;
 import com.ltc.letchat.base.BaseView;
+import com.ltc.letchat.event.ChatEvent;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public interface RecentChatContract {
 
         void loadRecentChat();
 
-        void loadNewMsg();
+        void onGetNewMsg(ChatEvent event);
 
         void deletChat();
 

@@ -1,17 +1,14 @@
 package com.ltc.letchat.news;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ltc.letchat.R;
+import com.ltc.letchat.base.BaseFragment;
 
-public class NewsFragment extends Fragment {
+public class NewsFragment extends BaseFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";

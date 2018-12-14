@@ -2,12 +2,13 @@ package com.ltc.letchat.recentchat;
 
 import android.content.Context;
 
-import com.ltc.letchat.MyApplication;
 import com.ltc.letchat.R;
-import com.ltc.letchat.net.api.IChat;
-import com.ltc.letchat.util.Utils;
+import com.ltc.letchat.event.ChatEvent;
 
-import java.io.IOException;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,21 +23,6 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
         recentChatView = view;
         recentChatView.onSetPresenter(this);
         this.context = context;
-        MyApplication.getChatManager().receiveMsg(new IChat.OnReceiveMsgListener() {
-            @Override
-            public void onReceive(String uri,String msg) {
-                try {
-                    RecentItem item = new RecentItem();
-                    item.head = context.getResources().getDrawable(R.drawable.others);
-                    item.userId = Utils.getStringValueFromJson(msg,"fromWho");
-                    item.recentName = Utils.getStringValueFromJson(msg,"fromWho");
-                    item.recentTemp = Utils.getStringValueFromJson(msg,"content");
-                    view.showNewChat(item);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     @Override
@@ -59,8 +45,14 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
     }
 
     @Override
-    public void loadNewMsg() {
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onGetNewMsg(ChatEvent event) {
+        RecentItem item = new RecentItem();
+        item.head = context.getResources().getDrawable(R.drawable.others);
+        item.userId = event.from;
+        item.recentName = event.from;
+        item.recentTemp = event.msg;
+        recentChatView.showNewChat(item);
     }
 
     @Override
@@ -75,11 +67,11 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
 
     @Override
     public void subscribe() {
-
+        EventBus.getDefault().register(this);
     }
 
     @Override
     public void unsubscribe() {
-
+        EventBus.getDefault().unregister(this);
     }
 }

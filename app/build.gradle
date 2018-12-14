@@ -7,13 +7,12 @@ android {
     defaultConfig {
         applicationId "com.ltc.letchat"
         minSdkVersion 19
-        targetSdkVersion 23
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -28,14 +27,7 @@ android {
         abortOnError false
     }
 
-    signingConfigs{
-        debug {
-            storeFile file('official.keystore')//签名文件路径
-            storePassword "bytesdk"
-            keyAlias "official"
-            keyPassword "bytesdk"  //签名密码
-        }
-    }
+
 }
 
 dependencies {
@@ -47,8 +39,11 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.4'
+    implementation 'com.trello.rxlifecycle2:rxlifecycle:2.2.2'
+    implementation 'com.trello.rxlifecycle2:rxlifecycle-android:2.2.2'
+    implementation 'com.trello.rxlifecycle2:rxlifecycle-components:2.2.2'
     implementation 'org.java-websocket:Java-WebSocket:1.3.0'
     implementation "com.daimajia.swipelayout:library:1.2.0@aar"
-
     implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'org.greenrobot:eventbus:3.1.1'
 }

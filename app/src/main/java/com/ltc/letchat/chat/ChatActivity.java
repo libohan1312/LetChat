@@ -2,7 +2,6 @@ package com.ltc.letchat.chat;
 
 import android.content.Intent;
 import android.graphics.Rect;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,12 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.ltc.letchat.MyApplication;
 import com.ltc.letchat.R;
 import com.ltc.letchat.base.BaseActivity;
-import com.ltc.letchat.net.api.IChat;
-import com.ltc.letchat.net.request.Talk;
-import com.ltc.letchat.util.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,6 +41,7 @@ public class ChatActivity extends BaseActivity implements ChatContract.View{
 
     ChatContract.Presenter presenter;
     ChatListAdapter chatListAdapter;
+    ViewTreeObserver.OnGlobalLayoutListener onGlobalLayoutListener;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,25 +62,37 @@ public class ChatActivity extends BaseActivity implements ChatContract.View{
         chatListAdapter = new ChatListAdapter(this);
         recyclerView.setAdapter(chatListAdapter);
 
-        recyclerView.getRootView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        onGlobalLayoutListener = new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 if(isKeyboardShown(recyclerView.getRootView())){
                     recyclerView.scrollToPosition(chatListAdapter.getItemCount()-1);
-//question here                    hh = getKeyboardHight(recyclerView.getRootView());
-//                    recyclerView.scrollBy(0,hh-linearLayout.getMeasuredHeight());
                 }
             }
-        });
-        try {
-            bt_send.setOnClickListener(v -> {
+        };
+        recyclerView.getRootView().getViewTreeObserver().addOnGlobalLayoutListener(onGlobalLayoutListener);
+        bt_send.setOnClickListener(v -> {
                 String msg = editText.getText().toString();
                 presenter.sendMessage(chatUserId,msg);
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        });
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        presenter.subscribe();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        presenter.unsubscribe();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        recyclerView.getRootView().getViewTreeObserver().removeOnGlobalLayoutListener(onGlobalLayoutListener);
     }
 
     private boolean isKeyboardShown(View rootView) {
@@ -105,12 +113,10 @@ public class ChatActivity extends BaseActivity implements ChatContract.View{
     }
 
     @Override
-    public void showMessage(boolean success,String from,String url, String msg) {
-        ChatItem chatItem = new ChatItem();
-        chatItem.content = msg;
-        chatItem.isMe = "me".equals(from);
-        chatItem.fromHow = from;
-        chatItem.success = success;
+    public void showMessage(ChatItem chatItem) {
+        if(chatItem == null){
+            return;
+        }
         chatListAdapter.addChat(chatItem);
         recyclerView.scrollToPosition(chatListAdapter.getItemCount()-1);
     }

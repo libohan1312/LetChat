@@ -9,9 +9,9 @@ import io.reactivex.subjects.PublishSubject;
 
 public class RxBus {
 
-    private static PublishSubject<Object> bus = PublishSubject.create();
+    private static PublishSubject<Event> bus = PublishSubject.create();
 
-    public static Observable<Object> bus(){
+    public static Observable<Event> bus(){
         return bus;
     }
 

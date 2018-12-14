@@ -1,9 +1,10 @@
 package com.ltc.letchat.base;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class RootActivity extends AppCompatActivity {
+import com.trello.rxlifecycle2.components.support.RxAppCompatActivity;
+
+public class RootActivity extends RxAppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

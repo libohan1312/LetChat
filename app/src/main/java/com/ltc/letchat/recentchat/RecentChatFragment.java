@@ -3,7 +3,7 @@ package com.ltc.letchat.recentchat;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,11 +12,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.ltc.letchat.R;
+import com.ltc.letchat.base.BaseFragment;
 import com.ltc.letchat.chat.ChatActivity;
 
 import java.util.List;
 
-public class RecentChatFragment extends Fragment implements RecentChatContract.View{
+public class RecentChatFragment extends BaseFragment implements RecentChatContract.View{
 
     RecentListAdapter chatListAdapter;
     RecyclerView recyclerView;
@@ -33,12 +34,12 @@ public class RecentChatFragment extends Fragment implements RecentChatContract.V
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = View.inflate(getActivity(),R.layout.chatrecentlist,null);
-        recyclerView = (RecyclerView) view.findViewById(R.id.recentlist);
+        recyclerView =  view.findViewById(R.id.recentlist);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         chatListAdapter = new RecentListAdapter();
         recyclerView.setAdapter(chatListAdapter);
 
-        noRecentLayout = (LinearLayout) view.findViewById(R.id.no_recent_layout);
+        noRecentLayout = view.findViewById(R.id.no_recent_layout);
         noRecentLayout.setVisibility(View.GONE);
 
         chatListAdapter.notifyDataSetChanged();
@@ -52,6 +53,18 @@ public class RecentChatFragment extends Fragment implements RecentChatContract.V
         recentChatPresenter.loadRecentChat();
 
         return view;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        recentChatPresenter.subscribe();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        recentChatPresenter.unsubscribe();
     }
 
     @Override

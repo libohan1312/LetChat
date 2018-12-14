@@ -8,9 +8,8 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonToken;
 import com.ltc.letchat.contacts.data.Contact;
+import com.ltc.letchat.net.response.BaseResponse;
 import com.ltc.letchat.net.response.GetContactsResp;
-
-import org.json.JSONException;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -21,26 +20,21 @@ import java.util.List;
  */
 public class Utils {
 
-    public static final String TYPE = "type";
-
-    public static String objectToJson(@NonNull Object object){
+    public static String objectToJson(@NonNull Object object) {
         Gson gson = new GsonBuilder().serializeNulls().create();
         String json = gson.toJson(object);
         return json;
     }
 
-
-
-    public static String getProtocolType(@NonNull String msg) throws IOException, JSONException {
+    public static BaseResponse getBaseResponsByJson(@NonNull String msg) {
         if(!isGoodJson(msg)){
             return null;
         }
-
-        return getStringValueFromJson(msg,"type");
+        BaseResponse baseResponse = jsonToObject(msg,BaseResponse.class);
+        return baseResponse;
     }
 
     public static String getStringValueFromJson(String msg,String key) throws IOException{
-        System.out.println("json paras is work to :"+msg+" , key is "+key);
         com.google.gson.stream.JsonReader jsonReader = new com.google.gson.stream.JsonReader(new StringReader(msg));
         jsonReader.beginObject();
 
@@ -81,6 +75,21 @@ public class Utils {
         } catch (JsonParseException e) {
             return false;
         }
+    }
+
+
+    public static class Test extends BaseResponse{
+        public Test(){
+            setType("test");
+        }
+        public String test;
+    }
+    public static void main(String[] args){
+        Test test = new Test();
+        test.test = "abc";
+        String tt = new Gson().toJson(test);
+        test = jsonToObject(tt,Test.class);
+        System.out.println(test.test);
     }
 
 }

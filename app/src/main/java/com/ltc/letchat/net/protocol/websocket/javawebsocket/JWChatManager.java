@@ -4,16 +4,19 @@ import android.util.Log;
 
 import com.ltc.letchat.RxBus.RxBus;
 import com.ltc.letchat.contacts.data.Contact;
+import com.ltc.letchat.event.ChatEvent;
 import com.ltc.letchat.net.protocol.websocket.ChatManagerWS;
 import com.ltc.letchat.net.request.GetContacts;
 import com.ltc.letchat.net.response.BaseResponse;
+import com.ltc.letchat.net.response.TalkResponse;
 import com.ltc.letchat.util.Utils;
 
+import org.greenrobot.eventbus.EventBus;
 import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.drafts.Draft;
+import org.java_websocket.drafts.Draft_10;
 import org.java_websocket.handshake.ServerHandshake;
-import org.json.JSONException;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.channels.NotYetConnectedException;
 import java.util.List;
@@ -27,6 +30,9 @@ import io.reactivex.functions.Consumer;
  */
 public class JWChatManager extends ChatManagerWS {
     public static final String EVENT_CONNECT = "event_connect";
+    protected Draft draft = new Draft_10();
+    private Disposable connectDisposable;
+
     public static class EventConnect extends RxBus.Event{
         public EventConnect(){
             type = EVENT_CONNECT;
@@ -48,17 +54,11 @@ public class JWChatManager extends ChatManagerWS {
         return instance;
     }
 
-    private Disposable connectDisposable;
-
-    public boolean isConnect() {
-        return client.getConnection().isOpen();
-    }
-
     private JWChatManager(Map<String,String> heads) throws URISyntaxException {
         super(heads);
+        init(heads);
     }
 
-    @Override
     protected void init(Map<String,String> heads) {
         client = new WebSocketClient(serverUri,draft,heads,2000) {
             @Override
@@ -68,30 +68,27 @@ public class JWChatManager extends ChatManagerWS {
 
             @Override
             public void onMessage(String message) {
-
                 try {
-                    String type = Utils.getProtocolType(message);
+                    EventBus.getDefault().post(message);
+                    BaseResponse baseResponse = Utils.getBaseResponsByJson(message);
+                    if(baseResponse == null){
+                        return;
+                    }
+                    String type = baseResponse.getType();
                     if(BaseResponse.TYPE_GETCONTACTS_RESP.equals(type)){
                         List<Contact> constants = Utils.getContacts(message);
                         if(getContactsListener == null) return;
                         getContactsListener.onContactReturn(constants);
                         return;
                     }else if(BaseResponse.TYPE_TOKE_RESP.equals(type)){
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                for (OnReceiveMsgListener listener : receiveMsgListeners) {
-                                    listener.onReceive(getURI().getHost(),message);
-                                }
-                            }
-                        });
+                        TalkResponse response = Utils.jsonToObject(message,TalkResponse.class);
+                        receiveMsg(response);
                         return;
                     }
-                } catch (IOException | JSONException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-                Log.d("receiveMsgNoHandle",message);
             }
 
             @Override
@@ -111,7 +108,9 @@ public class JWChatManager extends ChatManagerWS {
     public void connect(){
         client.connect();
     }
-
+    public boolean isConnect() {
+        return client.getConnection().isOpen();
+    }
     public void close(){
         client.close();
     }
@@ -131,6 +130,15 @@ public class JWChatManager extends ChatManagerWS {
     }
 
     @Override
+    public void receiveMsg(TalkResponse response) {
+        ChatEvent chatEvent = new ChatEvent();
+        chatEvent.from = response.fromWho;
+        chatEvent.msg = response.content;
+        chatEvent.success = true;
+        EventBus.getDefault().post(chatEvent);
+    }
+
+    @Override
     public void getContacts(OnGetContactsListener listener) {
 
         if(client == null){
@@ -139,16 +147,14 @@ public class JWChatManager extends ChatManagerWS {
         }
         if(!isConnect()){
             Log.e("requesterror","request should after connect");
-            connectDisposable = RxBus.bus().subscribe(new Consumer<Object>() {
+            connectDisposable = RxBus.bus().subscribe(new Consumer<RxBus.Event>() {
                 @Override
-                public void accept(Object o) {
-                    if(o instanceof RxBus.Event){
-                        RxBus.Event event = (RxBus.Event) o;
-                        if(EVENT_CONNECT.equals(event.type)){
-                            getContactsImpl(listener);
-                        }
+                public void accept(RxBus.Event event) {
+                    if (EVENT_CONNECT.equals(event.type)) {
+                        getContactsImpl(listener);
                     }
                 }
+
             });
             return;
         }else if(connectDisposable != null){

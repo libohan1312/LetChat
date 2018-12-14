@@ -5,9 +5,10 @@ import android.util.Log;
 
 import com.ltc.letchat.RxBus.RxBus;
 import com.ltc.letchat.net.api.IChat;
-import com.ltc.letchat.net.protocol.websocket.ChatManagerWS;
 import com.ltc.letchat.net.protocol.websocket.javawebsocket.JWChatManager;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.util.HashMap;
@@ -18,11 +19,12 @@ import java.util.Map;
  */
 public class MyApplication extends Application {
 
-    private static ChatManagerWS chatManager;
+    private static IChat chatManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        EventBus.getDefault().register(this);
         try {
             Map<String,String> heads = new HashMap<>();
             heads.put(Constant.USERID,Constant.userid);
@@ -34,18 +36,9 @@ public class MyApplication extends Application {
                     if(chatManager.isConnect()){
                         Log.e("connect","inninin");
                         RxBus.send(new JWChatManager.EventConnect());
-                        //Toast.makeText(getApplicationContext(),"connect success",Toast.LENGTH_LONG).show();
                     }else {
                         Log.e("connect","nono");
-                        //Toast.makeText(getApplicationContext(),"链接不成功",Toast.LENGTH_LONG).show();
                     }
-                }
-            });
-
-            chatManager.receiveMsg(new IChat.OnReceiveMsgListener() {
-                @Override
-                public void onReceive(String uri, String msg) {
-                    Log.e("all received",msg);
                 }
             });
 
@@ -56,7 +49,12 @@ public class MyApplication extends Application {
         }
     }
 
-    public static ChatManagerWS getChatManager() {
+    @Subscribe
+    public void receiveAll(String msg){
+        Log.e("all received",msg);
+    }
+
+    public static IChat getChatManager() {
         return chatManager;
     }
 
