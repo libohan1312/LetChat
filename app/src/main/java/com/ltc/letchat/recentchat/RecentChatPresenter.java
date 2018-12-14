@@ -5,6 +5,10 @@ import android.content.Context;
 import com.ltc.letchat.R;
 import com.ltc.letchat.database.DbManager;
 import com.ltc.letchat.database.Entity.ChatEntity;
+import com.ltc.letchat.database.Entity.ChatEntity_;
+import com.ltc.letchat.database.Entity.MyObjectBox;
+import com.ltc.letchat.database.Entity.RecentEntity;
+import com.ltc.letchat.database.Entity.RecentEntity_;
 import com.ltc.letchat.event.ChatEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -13,7 +17,12 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
+import io.objectbox.Property;
+import io.objectbox.android.AndroidScheduler;
+import io.objectbox.query.QueryBuilder;
+import io.objectbox.reactive.DataObserver;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -36,19 +45,24 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
     @Override
     public void loadRecentChat() {
         List<RecentItem> recentItems = new ArrayList<>();
-//        List<ChatEntity> chatEntities = DbManager.getEntity(ChatEntity.class).query().;
-//        Disposable disposable = Flowable.fromArray(chatEntities.toArray(new ChatEntity[]{})).map(chatEntity -> {
-//            ChatEvent chatEvent = new ChatEvent();
-//            chatEvent.from = chatEntity.fromWho;
-//            chatEvent.to = chatEntity.toWho;
-//            chatEvent.msg = chatEntity.content;
-//            chatEvent.success = true;
-//            return recentItem;
-//        }).toList().subscribe( recentItems2 -> {
-//                recentChatView.showRecentChat(recentItems2);
-//            }
-//        );
-//        compositeDisposable.add(disposable);
+
+        DbManager.getEntity(RecentEntity.class)
+                .query()
+                .order(RecentEntity_.time,QueryBuilder.DESCENDING)
+                .build().find();
+
+        Disposable disposable = Flowable.fromArray(chatEntities.toArray(new ChatEntity[]{})).map(chatEntity -> {
+            ChatEvent chatEvent = new ChatEvent();
+            chatEvent.from = chatEntity.fromWho;
+            chatEvent.to = chatEntity.toWho;
+            chatEvent.msg = chatEntity.content;
+            chatEvent.success = true;
+            return recentItem;
+        }).toList().subscribe( recentItems2 -> {
+                recentChatView.showRecentChat(recentItems2);
+            }
+        );
+        compositeDisposable.add(disposable);
 
         for(int i=0;i<2;i++) {
             RecentItem chatItem = new RecentItem();
@@ -84,14 +98,23 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
 
     private void saveMsg(ChatEvent item){
         Disposable disposable = Flowable.just(item).map(chatEvent -> {
-            ChatEntity entity = new ChatEntity();
+            RecentEntity entity = new RecentEntity();
             entity.content = chatEvent.msg;
-            entity.fromWho = chatEvent.from;
-            entity.toWho = chatEvent.to;
+            if("me".equals(chatEvent.from)){
+                entity.recentName = chatEvent.to;
+            }else {
+                entity.recentName = chatEvent.from;
+            }
             entity.time = System.currentTimeMillis();
             return entity;
-        }).map(chatEntity -> {
-            return DbManager.getEntity(ChatEntity.class).put(chatEntity);
+        }).map(recentEntity -> {
+            recentEntity.id = DbManager.getEntity(RecentEntity.class)
+                    .query()
+                    .equal(RecentEntity_.recentName,recentEntity.recentName)
+                    .build()
+                    .findFirst()
+                    .id;
+            return DbManager.getEntity(RecentEntity.class).put(recentEntity);
         }).subscribeOn(Schedulers.io()).subscribe(id -> {
                 DbManager.LogDP("put:"+id);
             });
