@@ -43,11 +43,8 @@ public class RecentChatFragment extends BaseFragment implements RecentChatContra
         noRecentLayout.setVisibility(View.GONE);
 
         chatListAdapter.notifyDataSetChanged();
-        chatListAdapter.listener = new RecentListAdapter.ViewHolder.OnChatItemClickListener() {
-            @Override
-            public void onClick(View v, RecentItem item) {
-                gotoChatView(item.recentName);
-            }
+        chatListAdapter.listener = (viewIn,recentItem) -> {
+            gotoChatView(recentItem.recentName);
         };
 
         recentChatPresenter.loadRecentChat();
@@ -77,6 +74,10 @@ public class RecentChatFragment extends BaseFragment implements RecentChatContra
 
     @Override
     public void showRecentChat(List<RecentItem> recentItems) {
+        if (recentItems == null || recentItems.size() <= 0) {
+            noRecentLayout.setVisibility(View.VISIBLE);
+            return;
+        }
         chatListAdapter.datas = recentItems;
         chatListAdapter.notifyDataSetChanged();
     }

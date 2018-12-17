@@ -4,9 +4,6 @@ import android.content.Context;
 
 import com.ltc.letchat.R;
 import com.ltc.letchat.database.DbManager;
-import com.ltc.letchat.database.Entity.ChatEntity;
-import com.ltc.letchat.database.Entity.ChatEntity_;
-import com.ltc.letchat.database.Entity.MyObjectBox;
 import com.ltc.letchat.database.Entity.RecentEntity;
 import com.ltc.letchat.database.Entity.RecentEntity_;
 import com.ltc.letchat.event.ChatEvent;
@@ -15,15 +12,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-
-import io.objectbox.Property;
-import io.objectbox.android.AndroidScheduler;
-import io.objectbox.query.QueryBuilder;
-import io.objectbox.reactive.DataObserver;
 import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -34,9 +24,9 @@ import io.reactivex.schedulers.Schedulers;
 public class RecentChatPresenter implements RecentChatContract.Presenter {
     private RecentChatContract.View recentChatView;
     private Context context;
-    CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
-    public RecentChatPresenter(Context context,RecentChatContract.View view){
+    public RecentChatPresenter(Context context,RecentChatContract.View view) {
         recentChatView = view;
         recentChatView.onSetPresenter(this);
         this.context = context;
@@ -44,40 +34,40 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
 
     @Override
     public void loadRecentChat() {
-        List<RecentItem> recentItems = new ArrayList<>();
+        Disposable disposable =  Flowable
+                .fromArray(DbManager.getEntity(RecentEntity.class).getAll().toArray(new RecentEntity[]{}))
+                .map(recentEntity -> {
+                    RecentItem item = new RecentItem();
+                    item.success = recentEntity.success;
+                    item.recentName = recentEntity.recentName;
+                    item.recentTemp = recentEntity.content;
+                    item.userId = recentEntity.recentName;
+                    item.head = context.getResources().getDrawable(R.drawable.others);
+                    return item;
+                })
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(recentItemList -> {
+                    recentChatView.showRecentChat(recentItemList);
+                });
 
-        DbManager.getEntity(RecentEntity.class)
-                .query()
-                .order(RecentEntity_.time,QueryBuilder.DESCENDING)
-                .build().find();
-
-        Disposable disposable = Flowable.fromArray(chatEntities.toArray(new ChatEntity[]{})).map(chatEntity -> {
-            ChatEvent chatEvent = new ChatEvent();
-            chatEvent.from = chatEntity.fromWho;
-            chatEvent.to = chatEntity.toWho;
-            chatEvent.msg = chatEntity.content;
-            chatEvent.success = true;
-            return recentItem;
-        }).toList().subscribe( recentItems2 -> {
-                recentChatView.showRecentChat(recentItems2);
-            }
-        );
         compositeDisposable.add(disposable);
 
-        for(int i=0;i<2;i++) {
-            RecentItem chatItem = new RecentItem();
-            if(i%2==0){
-                chatItem.head = context.getResources().getDrawable(R.drawable.me);
-                chatItem.recentName = "阿凡达";
-                chatItem.recentTemp = "fdadfadfasdffadsfasfafdafafasdfasfasfasfasfasfdasfasdff";
-            }else {
-                chatItem.head = context.getResources().getDrawable(R.drawable.others);
-                chatItem.recentName = "狗日阿灿";
-                chatItem.recentTemp = "法拉伐风景饿啦放假fadsfasf啊了放假啊ffadsfasdfsfdafadfasf了";
-            }
-            recentItems.add(chatItem);
-        }
-        recentChatView.showRecentChat(recentItems);
+//        for(int i=0;i<2;i++) {
+//            RecentItem chatItem = new RecentItem();
+//            if(i%2==0){
+//                chatItem.head = context.getResources().getDrawable(R.drawable.me);
+//                chatItem.recentName = "阿凡达";
+//                chatItem.recentTemp = "fdadfadfasdffadsfasfafdafafasdfasfasfasfasfasfdasfasdff";
+//            }else {
+//                chatItem.head = context.getResources().getDrawable(R.drawable.others);
+//                chatItem.recentName = "狗日阿灿";
+//                chatItem.recentTemp = "法拉伐风景饿啦放假fadsfasf啊了放假啊ffadsfasdfsfdafadfasf了";
+//            }
+//            recentItems.add(chatItem);
+//        }
+
     }
 
     @Override
@@ -92,6 +82,7 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
             item.recentName = event.from;
         }
         item.recentTemp = event.msg;
+        item.success = event.success;
         recentChatView.showNewChat(item);
         saveMsg(event);
     }
@@ -106,16 +97,20 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
                 entity.recentName = chatEvent.from;
             }
             entity.time = System.currentTimeMillis();
+            entity.success = chatEvent.success;
             return entity;
         }).map(recentEntity -> {
-            recentEntity.id = DbManager.getEntity(RecentEntity.class)
-                    .query()
-                    .equal(RecentEntity_.recentName,recentEntity.recentName)
-                    .build()
-                    .findFirst()
-                    .id;
+            RecentEntity find = DbManager.getEntity(RecentEntity.class)
+            .query()
+            .equal(RecentEntity_.recentName, recentEntity.recentName)
+            .build()
+            .findFirst();
+            if (find != null) {
+                recentEntity.id = find.id;
+            }
             return DbManager.getEntity(RecentEntity.class).put(recentEntity);
-        }).subscribeOn(Schedulers.io()).subscribe(id -> {
+        }).subscribeOn(Schedulers.io())
+                .subscribe(id -> {
                 DbManager.LogDP("put:"+id);
             });
         compositeDisposable.add(disposable);

@@ -11,4 +11,5 @@ public class RecentItem {
     public Drawable head;
     public String recentTemp;
     public int postion;
+    public boolean success;
 }

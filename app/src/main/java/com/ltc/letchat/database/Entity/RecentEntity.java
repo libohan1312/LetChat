@@ -9,4 +9,5 @@ public class RecentEntity {
     public String recentName;
     public String content;
     public long time;
+    public boolean success;
 }
