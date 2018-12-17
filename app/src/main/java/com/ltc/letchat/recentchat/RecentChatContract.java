@@ -37,7 +37,7 @@ public interface RecentChatContract {
 
         void onGetNewMsg(ChatEvent event);
 
-        void deletChat();
+        void deleteChat();
 
         void remendNewMsg();
 

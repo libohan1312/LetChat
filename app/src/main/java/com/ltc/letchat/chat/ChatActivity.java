@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 import com.ltc.letchat.R;
 import com.ltc.letchat.base.BaseActivity;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -75,6 +77,7 @@ public class ChatActivity extends BaseActivity implements ChatContract.View{
                 String msg = editText.getText().toString();
                 presenter.sendMessage(chatUserId,msg);
         });
+        presenter.loadAllChat();
     }
 
     @Override
@@ -124,6 +127,11 @@ public class ChatActivity extends BaseActivity implements ChatContract.View{
     @Override
     public void afterSendMessage(boolean success) {
         editText.setText(null);
+    }
+
+    @Override
+    public void showAllMassage(List<ChatItem> chatItemList) {
+        chatListAdapter.loadAllItem(chatItemList);
     }
 
     @Override

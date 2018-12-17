@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.ltc.letchat.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,6 +39,11 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
 
     public void addChat(ChatItem chatItem){
         datas.add(chatItem);
+        notifyDataSetChanged();
+    }
+
+    public void loadAllItem(List<ChatItem> chatItemList){
+        datas.addAll(chatItemList);
         notifyDataSetChanged();
     }
 

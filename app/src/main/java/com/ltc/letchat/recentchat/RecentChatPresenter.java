@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.ltc.letchat.R;
 import com.ltc.letchat.database.DbManager;
+import com.ltc.letchat.database.Entity.ChatEntity;
 import com.ltc.letchat.database.Entity.RecentEntity;
 import com.ltc.letchat.database.Entity.RecentEntity_;
 import com.ltc.letchat.event.ChatEvent;
@@ -54,20 +55,6 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
 
         compositeDisposable.add(disposable);
 
-//        for(int i=0;i<2;i++) {
-//            RecentItem chatItem = new RecentItem();
-//            if(i%2==0){
-//                chatItem.head = context.getResources().getDrawable(R.drawable.me);
-//                chatItem.recentName = "阿凡达";
-//                chatItem.recentTemp = "fdadfadfasdffadsfasfafdafafasdfasfasfasfasfasfdasfasdff";
-//            }else {
-//                chatItem.head = context.getResources().getDrawable(R.drawable.others);
-//                chatItem.recentName = "狗日阿灿";
-//                chatItem.recentTemp = "法拉伐风景饿啦放假fadsfasf啊了放假啊ffadsfasdfsfdafadfasf了";
-//            }
-//            recentItems.add(chatItem);
-//        }
-
     }
 
     @Override
@@ -111,13 +98,28 @@ public class RecentChatPresenter implements RecentChatContract.Presenter {
             return DbManager.getEntity(RecentEntity.class).put(recentEntity);
         }).subscribeOn(Schedulers.io())
                 .subscribe(id -> {
-                DbManager.LogDP("put:"+id);
+                DbManager.LogDP("put_recent:"+id);
             });
         compositeDisposable.add(disposable);
+        Disposable disposable2 = Flowable.just(item).map(chatEvent -> {
+            ChatEntity entity = new ChatEntity();
+            entity.content = chatEvent.msg;
+            entity.toWho = chatEvent.to;
+            entity.fromWho = chatEvent.from;
+            entity.time = System.currentTimeMillis();
+            entity.success = chatEvent.success;
+            return entity;
+        }).map(chatEntity -> {
+            return DbManager.getEntity(ChatEntity.class).put(chatEntity);
+        }).subscribeOn(Schedulers.io())
+          .subscribe(id -> {
+               DbManager.LogDP("put_chat:"+id);
+          });
+        compositeDisposable.add(disposable2);
     }
 
     @Override
-    public void deletChat() {
+    public void deleteChat() {
 
     }
 

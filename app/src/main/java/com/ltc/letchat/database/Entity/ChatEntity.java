@@ -11,4 +11,5 @@ public class ChatEntity {
     public String content;
     public long time;
     public String toWho = "me";
+    public boolean success;
 }

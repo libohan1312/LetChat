@@ -3,6 +3,8 @@ package com.ltc.letchat.chat;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.ltc.letchat.database.DbManager;
+import com.ltc.letchat.database.Entity.ChatEntity;
 import com.ltc.letchat.event.ChatEvent;
 import com.ltc.letchat.net.NetworkManager;
 import com.ltc.letchat.net.request.Talk;
@@ -12,9 +14,16 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class ChatPresenter implements ChatContract.Presenter {
     ChatContract.View view;
     String userId;
+    CompositeDisposable compositeDisposable = new CompositeDisposable();
     public ChatPresenter(Context context , ChatContract.View view, String userId){
         this.view = view;
         this.userId = userId;
@@ -28,6 +37,22 @@ public class ChatPresenter implements ChatContract.Presenter {
         view.showMessage(chatItem);
     }
 
+    @Override
+    public void loadAllChat() {
+        Disposable disposable = Flowable.fromArray(DbManager
+                        .getEntity(ChatEntity.class)
+                        .getAll()
+                        .toArray(new ChatEntity[]{}))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(this::getChatItem)
+                .toList()
+                .subscribe(chatItems -> {
+                    view.showAllMassage(chatItems);
+                });
+        compositeDisposable.add(disposable);
+    }
+
     @NonNull
     private ChatItem getChatItem(ChatEvent chatEvent) {
         ChatItem chatItem = new ChatItem();
@@ -35,6 +60,14 @@ public class ChatPresenter implements ChatContract.Presenter {
         chatItem.isMe = "me".equals(chatEvent.from);
         chatItem.fromHow = chatEvent.from;
         chatItem.success = chatEvent.success;
+        return chatItem;
+    }
+    private ChatItem getChatItem(ChatEntity chatEntity){
+        ChatItem chatItem = new ChatItem();
+        chatItem.success = chatEntity.success;
+        chatItem.fromHow = chatEntity.fromWho;
+        chatItem.content = chatEntity.content;
+        chatItem.isMe = "me".equals(chatEntity.fromWho);
         return chatItem;
     }
 
@@ -74,5 +107,6 @@ public class ChatPresenter implements ChatContract.Presenter {
     @Override
     public void unsubscribe() {
         EventBus.getDefault().unregister(this);
+        compositeDisposable.dispose();
     }
 }
