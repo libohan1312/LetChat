@@ -19,13 +19,10 @@ public interface IChat {
 
     void getContacts(OnGetContactsListener listener);
 
-    void onOpen(OnConnectOpen onConnectOpen);
+    void onOpen();
 
     interface OnGetContactsListener{
         void onContactReturn(List<Contact> contacts);
     }
 
-    interface OnConnectOpen{
-        void onOpen(ServerHandshake handshakedata);
-    }
 }

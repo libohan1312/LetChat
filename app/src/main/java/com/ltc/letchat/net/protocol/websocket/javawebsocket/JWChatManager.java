@@ -29,9 +29,7 @@ import io.reactivex.functions.Consumer;
  * Created by Administrator on 2016/7/30.
  */
 public class JWChatManager extends ChatManagerWS {
-    public static final String EVENT_CONNECT = "event_connect";
     protected Draft draft = new Draft_10();
-    private Disposable connectDisposable;
 
     public static class EventConnect extends RxBus.Event{
         public EventConnect(){
@@ -42,7 +40,7 @@ public class JWChatManager extends ChatManagerWS {
             return null;
         }
     }
-    WebSocketClient client;
+    private WebSocketClient client;
     public static ChatManagerWS getInstance(Map<String,String> heads) throws URISyntaxException {
         if(instance == null){
             synchronized (ChatManagerWS.class){
@@ -63,7 +61,7 @@ public class JWChatManager extends ChatManagerWS {
         client = new WebSocketClient(serverUri,draft,heads,2000) {
             @Override
             public void onOpen(ServerHandshake handshakedata) {
-                onConnectOpen.onOpen(handshakedata);
+                JWChatManager.this.onOpen();
             }
 
             @Override
@@ -79,11 +77,9 @@ public class JWChatManager extends ChatManagerWS {
                         List<Contact> constants = Utils.getContacts(message);
                         if(getContactsListener == null) return;
                         getContactsListener.onContactReturn(constants);
-                        return;
                     }else if(BaseResponse.TYPE_TOKE_RESP.equals(type)){
                         TalkResponse response = Utils.jsonToObject(message,TalkResponse.class);
                         receiveMsg(response);
-                        return;
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -127,15 +123,6 @@ public class JWChatManager extends ChatManagerWS {
             e.printStackTrace();
             return false;
         }
-    }
-
-    @Override
-    public void receiveMsg(TalkResponse response) {
-        ChatEvent chatEvent = new ChatEvent();
-        chatEvent.from = response.fromWho;
-        chatEvent.msg = response.content;
-        chatEvent.success = true;
-        EventBus.getDefault().post(chatEvent);
     }
 
     @Override

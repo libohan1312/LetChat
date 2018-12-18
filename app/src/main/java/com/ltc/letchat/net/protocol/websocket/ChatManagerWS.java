@@ -1,27 +1,29 @@
 package com.ltc.letchat.net.protocol.websocket;
 
-import android.os.Handler;
-import android.os.Looper;
+import android.util.Log;
 
 import com.ltc.letchat.Constant;
+import com.ltc.letchat.RxBus.RxBus;
+import com.ltc.letchat.event.ChatEvent;
 import com.ltc.letchat.net.api.IChat;
+import com.ltc.letchat.net.protocol.websocket.javawebsocket.JWChatManager;
+import com.ltc.letchat.net.response.TalkResponse;
 
-import org.java_websocket.drafts.Draft;
-import org.java_websocket.drafts.Draft_10;
+import org.greenrobot.eventbus.EventBus;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+
+import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Administrator on 2016/7/30.
  */
 public abstract class ChatManagerWS implements IChat {
+    public static final String EVENT_CONNECT = "event_connect";
     protected OnGetContactsListener getContactsListener;
-    protected OnConnectOpen onConnectOpen;
-
+    protected Disposable connectDisposable;
     protected URI serverUri;
 
     protected static ChatManagerWS instance;
@@ -31,7 +33,21 @@ public abstract class ChatManagerWS implements IChat {
     }
 
     @Override
-    public void onOpen(OnConnectOpen onConnectOpen) {
-        this.onConnectOpen = onConnectOpen;
+    public void receiveMsg(TalkResponse response) {
+        ChatEvent chatEvent = new ChatEvent();
+        chatEvent.from = response.fromWho;
+        chatEvent.msg = response.content;
+        chatEvent.success = true;
+        EventBus.getDefault().post(chatEvent);
+    }
+
+    @Override
+    public void onOpen() {
+        if(isConnect()){
+            Log.e("connect","inninin");
+            RxBus.send(new JWChatManager.EventConnect());
+        }else {
+            Log.e("connect","nono");
+        }
     }
 }
