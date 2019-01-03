@@ -29,6 +29,9 @@ import okio.ByteString;
 
 public class OKChatManager extends ChatManagerWS {
     private WebSocket webSocket;
+    private boolean isConnect;
+    private OkHttpClient httpClient;
+    private Request request;
     public static ChatManagerWS getInstance(Map<String,String> heads) throws URISyntaxException {
         if (instance == null) {
             synchronized (ChatManagerWS.class){
@@ -42,13 +45,24 @@ public class OKChatManager extends ChatManagerWS {
 
     private OKChatManager(Map<String, String> heads) throws URISyntaxException {
         super(heads);
-        OkHttpClient httpClient = new OkHttpClient.Builder().build();
-        Request request = null;
+        httpClient = new OkHttpClient.Builder().build();
         try {
             request = new Request.Builder().url(serverUri.toString()).headers(Headers.of(heads)).build();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+
+    @Override
+    public boolean isConnect() {
+//        String test = Utils.objectToJson(new ConnectTest());
+        return webSocket != null && isConnect; //&& webSocket.send(test)  这个先不加，感觉太费
+    }
+
+    @Override
+    public void connect() {
         if(request == null){
             return;
         }
@@ -56,6 +70,7 @@ public class OKChatManager extends ChatManagerWS {
             @Override
             public void onOpen(WebSocket webSocket, Response response) {
                 OKChatManager.this.webSocket = webSocket;
+                isConnect = true;
                 OKChatManager.this.onOpen();
             }
 
@@ -94,25 +109,15 @@ public class OKChatManager extends ChatManagerWS {
             @Override
             public void onClosed(WebSocket webSocket, int code, String reason) {
                 super.onClosed(webSocket, code, reason);
+                isConnect = false;
             }
 
             @Override
             public void onFailure(WebSocket webSocket, Throwable t, @Nullable Response response) {
                 super.onFailure(webSocket, t, response);
+                isConnect = false;
             }
         });
-    }
-
-
-    @Override
-    public boolean isConnect() {
-//        String test = Utils.objectToJson(new ConnectTest());
-        return webSocket != null; //&& webSocket.send(test)  这个先不加，感觉太费
-    }
-
-    @Override
-    public void connect() {
-
     }
 
     @Override
@@ -130,10 +135,6 @@ public class OKChatManager extends ChatManagerWS {
 
     @Override
     public void getContacts(OnGetContactsListener listener) {
-        if(webSocket == null){
-            Log.e("get contacts error","client is null");
-            return;
-        }
         if(!isConnect()){
             Log.e("requesterror","request should after connect");
             connectDisposable = RxBus.bus().subscribe(new Consumer<RxBus.Event>() {
@@ -157,9 +158,30 @@ public class OKChatManager extends ChatManagerWS {
         }
     }
 
+    @Override
+    public void reConnect(Map<String, String> header) {
+        try {
+            try {
+                request = new Request.Builder().url(serverUri.toString()).headers(Headers.of(header)).build();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            connect();
+            if(connectDisposable != null && !connectDisposable.isDisposed()){
+                connectDisposable.dispose();
+            }
+            getContacts(this.getContactsListener);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void getContactsImpl(OnGetContactsListener listener) {
         this.getContactsListener = listener;
         String getContactsProtocol = Utils.objectToJson(new GetContacts());
         webSocket.send(getContactsProtocol);
+        if(connectDisposable != null && !connectDisposable.isDisposed()){
+            connectDisposable.dispose();
+        }
     }
 }

@@ -102,7 +102,8 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.action_favorite:
-                Toast.makeText(this,"one",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"refresh",Toast.LENGTH_SHORT).show();
+                NetworkManager.reConnect();
                 return true;
             case R.id.action_settings:
                 Toast.makeText(this,"two",Toast.LENGTH_SHORT).show();

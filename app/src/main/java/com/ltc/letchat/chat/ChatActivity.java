@@ -78,6 +78,7 @@ public class ChatActivity extends BaseActivity implements ChatContract.View{
                 presenter.sendMessage(chatUserId,msg);
         });
         presenter.loadAllChat();
+        recyclerView.scrollToPosition(chatListAdapter.getItemCount()-1);
     }
 
     @Override

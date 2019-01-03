@@ -155,6 +155,11 @@ public class JWChatManager extends ChatManagerWS {
         }
     }
 
+    @Override
+    public void reConnect(Map<String, String> header) {
+        client.connect();
+    }
+
     private void getContactsImpl(OnGetContactsListener listener) {
         this.getContactsListener = listener;
         String getContactsProtocol = Utils.objectToJson(new GetContacts());

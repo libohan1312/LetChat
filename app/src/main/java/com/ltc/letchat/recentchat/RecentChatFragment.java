@@ -55,6 +55,9 @@ public class RecentChatFragment extends BaseFragment implements RecentChatContra
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(recentChatPresenter == null){
+            new RecentChatPresenter(getContext(),this);
+        }
         recentChatPresenter.subscribe();
     }
 

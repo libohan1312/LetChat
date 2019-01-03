@@ -25,6 +25,12 @@ public class NetworkManager {
         }
     }
 
+    public static void reConnect(){
+        Map<String,String> heads = new HashMap<>();
+        heads.put(Constant.USERID,Constant.userid);
+        chatManager.reConnect(heads);
+    }
+
     public static IChat getChatManager() {
         if(chatManager == null){
             initChatManager();

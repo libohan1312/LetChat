@@ -11,5 +11,6 @@ public class Constant {
     public static final String userid = Build.SERIAL;
     public static final String serverUri = "ws://192.168.0.110:8889";
     public static final String serverUri_test = "ws://10.95.137.254:8889";
+    public static final String httpUri_test = "https://10.95.137.254:8443";
 
 }
