@@ -15,15 +15,12 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.FormBody;
 import okhttp3.Headers;
@@ -59,50 +56,43 @@ public class OKUtil {
                 .build();
     }
 
-    public static Flowable<JSONObject> doRequest(OKRequestEntity okRequestEntity){
-        return Flowable.just(okRequestEntity)
+    public static Single<JSONObject> doRequest(OKRequestEntity okRequestEntity){
+        return Single.just(okRequestEntity)
                 .observeOn(Schedulers.io())
-                .map(new Function<OKRequestEntity, JSONObject>() {
-                    @Override
-                    public JSONObject apply(OKRequestEntity okRequestEntity) throws Exception {
-                        try {
-                            if (okRequestEntity.method.equals(METHOD_GET)) {
-                                Request request = new Request.Builder()
-                                        .url(okRequestEntity.url)
-                                        .headers(Headers.of(okRequestEntity.headers))
-                                        .build();
-                                Response response = okHttpClient.newCall(request).execute();
-                                String body = response.body().string();
-                                return new JSONObject(body);
-                            }else if(okRequestEntity.method.equals(METHOD_POST)){
-                                FormBody.Builder builder = new FormBody.Builder();
-                                for (Map.Entry<String, Object> entry : okRequestEntity.params.entrySet()) {
-                                    if (entry.getValue() == null || entry.getKey() == null) {
-                                        continue;
-                                    }
-                                    builder.add(entry.getKey(),entry.getValue().toString());
+                .map(okRequestEntity1 -> {
+                    try {
+                        if (okRequestEntity1.method.equals(METHOD_GET)) {
+                            Request request = new Request.Builder()
+                                    .url(okRequestEntity1.url)
+//                                    .header("Upgrade-Insecure-Requests","1")
+                                    .headers(Headers.of(okRequestEntity1.headers))
+                                    .build();
+                            Response response = okHttpClient.newCall(request).execute();
+                            String body = response.body().string();
+                            return new JSONObject(body);
+                        }else if(okRequestEntity1.method.equals(METHOD_POST)){
+                            FormBody.Builder builder = new FormBody.Builder();
+                            for (Map.Entry<String, Object> entry : okRequestEntity1.params.entrySet()) {
+                                if (entry.getValue() == null || entry.getKey() == null) {
+                                    continue;
                                 }
-                                Request request = new Request.Builder()
-                                        .url(okRequestEntity.url)
-                                        .method(METHOD_POST, builder.build())
-                                        .headers(Headers.of(okRequestEntity.headers))
-                                        .build();
-                                Response response = okHttpClient.newCall(request).execute();
-                                String body = response.body().string();
-                                return new JSONObject(body);
+                                builder.add(entry.getKey(),entry.getValue().toString());
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            Request request = new Request.Builder()
+                                    .url(okRequestEntity1.url)
+                                    .method(METHOD_POST, builder.build())
+                                    .headers(Headers.of(okRequestEntity1.headers))
+                                    .build();
+                            Response response = okHttpClient.newCall(request).execute();
+                            String body = response.body().string();
+                            return new JSONObject(body);
                         }
-                        return new JSONObject();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }).doOnNext(new Consumer<JSONObject>() {
-                    @Override
-                    public void accept(JSONObject jsonObject) throws Exception {
-                        //jsonObject.put("abc","123");
-                    }
+                    return new JSONObject();
                 })
                 .subscribeOn(AndroidSchedulers.mainThread());
     }
@@ -147,19 +137,14 @@ public class OKUtil {
 
         //获取HostnameVerifier
         public static HostnameVerifier getHostnameVerifier() {
-            HostnameVerifier hostnameVerifier = new HostnameVerifier() {
-                @Override
-                public boolean verify(String s, SSLSession sslSession) {
-                    return true;
-                }
-            };
+            HostnameVerifier hostnameVerifier = (s, sslSession) -> true;
             return hostnameVerifier;
         }
     }
 
 
     public static class OKRequestEntity{
-        public String url = Constant.httpUri_test;
+        public String url = Constant.http2Uri_test;
         public String method = METHOD_GET;
         public Map<String,String> headers = new HashMap<>();
         public Map<String,Object> params = new HashMap<>();
